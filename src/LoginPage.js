@@ -1,18 +1,14 @@
 /* eslint-disable jsx-a11y/alt-text */
 import React from "react";
 import styled from "styled-components";
-import IconButton from "@mui/material/IconButton";
 import { auth, provider } from "./firebase";
-import { useDispatch, useSelector } from "react-redux";
-import { setUserLogOut, setActiveUser } from "./features/counter/userSlice";
-import { selectUserName, selectUserEmail } from "./features/counter/userSlice";
+import { useDispatch } from "react-redux";
+import { setActiveUser } from "./features/counter/userSlice";
 import { Button } from "@mui/material";
 function LoginPage() {
   //tool to set up a new value we will use
   const dispatch = useDispatch();
   //read out the current state
-  const userName = useSelector(selectUserName);
-  const userEmail = useSelector(selectUserEmail);
   const handleSignIn = () => {
     auth
       .signInWithPopup(provider)
@@ -21,6 +17,8 @@ function LoginPage() {
           setActiveUser({
             userName: result.user.displayName,
             userEmail: result.user.email,
+            userPhoto: result.user.photoURL,
+            userUid: result.user.uid,
           })
         );
       })
@@ -29,14 +27,6 @@ function LoginPage() {
       });
   };
 
-  const handleSignOut = () => {
-    auth
-      .signOut()
-      .then(() => dispatch(setUserLogOut))
-      .catch((error) => {
-        console.log(error);
-      });
-  };
   return (
     <Container>
       <ContentLeft>

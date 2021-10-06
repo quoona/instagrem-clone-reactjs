@@ -1,11 +1,24 @@
-import { Avatar } from "@mui/material";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import Story from "./Story";
 import PostIG from "./PostIG";
 import SidebarRow from "./SidebarRow";
+
 import SidebarRowBottom from "./SidebarRowBottom";
+import { useSelector } from "react-redux";
+import { selectUser } from "./features/counter/userSlice";
+import db, { auth } from "./firebase";
 function Body() {
+  const [posts, setPosts] = useState([]);
+  const user = useSelector(selectUser);
+  useEffect(() => {
+    db.collection("posts").onSnapshot((snapshot) =>
+      //retrive all data from the document as object doc.data()
+      setPosts(snapshot.docs.map((doc) => ({ id: doc.id, data: doc.data() })))
+    );
+    console.log("useeffect run");
+  }, []);
+
   return (
     <Container>
       <Section>
@@ -19,36 +32,21 @@ function Body() {
             <Story profilePic="./images/cat.jpg" title="Quoonaa" />
             <Story profilePic="./images/cat.jpg" title="Quoonaa" />
           </StoryStray>
-          <PostIG
-            profilePic="./images/cat_2.jpg"
-            message="Hello"
-            username="cat two"
-            image="./images/cheems.jpg"
-          />
-          <PostIG
-            profilePic="./images/cat.jpg"
-            message="Hello"
-            username="cat two"
-            image="./images/cheems.jpg"
-          />
-          <PostIG
-            profilePic="./images/cheems_2.jpg"
-            message="Hello"
-            username="cat two"
-            image="./images/way.jpg"
-          />
-          <PostIG
-            profilePic="./images/cat_2.jpg"
-            message="Hello"
-            username="cheems"
-            image="./images/cheems_3.jpg"
-          />
+          {posts.map((post) => (
+            <PostIG
+              key={post.data.id}
+              profilePic={post.data.profilePic}
+              message={post.data.message}
+              username={post.data.username}
+              image={post.data.image}
+            />
+          ))}
         </ContentLeft>
         <ContentRight>
           <SidebarRow
-            profilePic="./images/cat.jpg"
-            title="Nguyen Quoc Nam"
-            username="quoonaa"
+            profilePic={user.userPhoto}
+            title={user.userName}
+            username={user.userName}
           />
 
           <SidebarRowBottom

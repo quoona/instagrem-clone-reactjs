@@ -1,14 +1,12 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "./App.css";
 import Header from "./Header";
 import Body from "./Body";
-import { auth, provider } from "./firebase";
 import { useDispatch, useSelector } from "react-redux";
-import { setUserLogOut, setActiveUser } from "./features/counter/userSlice";
 import { selectUserName, selectUserEmail } from "./features/counter/userSlice";
-import { Button } from "@mui/material";
-
+import { setActiveUser, setUserLogOut } from "./features/counter/userSlice";
 import LoginPage from "./LoginPage";
+import { auth } from "./firebase";
 function App() {
   //tool to set up a new value we will use
   const dispatch = useDispatch();
@@ -16,17 +14,33 @@ function App() {
   const userName = useSelector(selectUserName);
   const userEmail = useSelector(selectUserEmail);
 
-  
-
+  useEffect(() => {
+    auth.onAuthStateChanged((userAuth) => {
+      if (userAuth) {
+        console.log(`user is`, userAuth);
+        dispatch(
+          setActiveUser({
+            userUid: userAuth.uid,
+            userPhoto: userAuth.photoURL,
+            userEmail: userAuth.email,
+            userName: userAuth.displayName,
+          })
+        );
+      } else {
+        //user logout
+        dispatch(setUserLogOut());
+      }
+    });
+  }, [dispatch]);
   return (
     <div className="App">
-      {!userName ? (
-        <LoginPage />
-      ) : (
+      {userName ? (
         <>
           <Header />
           <Body />
         </>
+      ) : (
+        <LoginPage />
       )}
     </div>
   );

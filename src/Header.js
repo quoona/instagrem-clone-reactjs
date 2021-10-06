@@ -2,7 +2,7 @@
 /* eslint-disable no-const-assign */
 /* eslint-disable jsx-a11y/alt-text */
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import ExploreOutlinedIcon from "@mui/icons-material/ExploreOutlined";
@@ -12,7 +12,26 @@ import MessageOutlinedIcon from "@mui/icons-material/MessageOutlined";
 import { Avatar, IconButton } from "@mui/material";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import MeetingRoomIcon from "@mui/icons-material/MeetingRoom";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  selectUserEmail,
+  selectUserName,
+  setUserLogOut,
+  selectUser,
+} from "./features/counter/userSlice";
+import { auth, provider } from "./firebase";
 function Header() {
+  const user = useSelector(selectUser);
+
+  const handleSignOut = () => {
+    auth
+      .signOut()
+      .then(setUserLogOut)
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   return (
     <Container>
       <Nav>
@@ -45,9 +64,10 @@ function Header() {
             />
           </IconButton>
           <IconButton>
-            <Avatar src="./images/cat.jpg" />
+            {/* Selector User */}
+            <Avatar src={user.userPhoto} />
           </IconButton>
-          <IconButton>
+          <IconButton onClick={handleSignOut}>
             <MeetingRoomIcon />
           </IconButton>
         </MenuLeft>
